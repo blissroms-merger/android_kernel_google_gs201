@@ -64,8 +64,10 @@ static inline void rt_task_fits_capacity(struct task_struct *p, int cpu,
 	unsigned long uclamp_min = uclamp_eff_value_pixel_mod(p, UCLAMP_MIN);
 	unsigned long uclamp_max = uclamp_eff_value_pixel_mod(p, UCLAMP_MAX);
 	unsigned long util = task_util(p);
+    bool is_important = (get_prefer_idle(p) || uclamp_latency_sensitive(p)) 
+                            && (uclamp_boosted(p) || get_prefer_high_cap(p));
 
-	if (get_prefer_high_cap(p) && cpu < MID_CAPACITY_CPU) {
+	if (is_important && cpu < MID_CAPACITY_CPU) {
 		*fits = false;
 		*fits_original = false;
 		return;
